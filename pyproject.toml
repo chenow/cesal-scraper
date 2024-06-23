@@ -30,6 +30,7 @@ target-version = "py312"
         "PLR2004",
         "TRY002",
         "EM102",
+        "DTZ007",
     ]
     select = ["ALL"]
         [tool.ruff.lint.isort]

@@ -1,22 +1,18 @@
+import re
 from logging import getLogger
 from pathlib import Path
 
 import requests
-from bs4 import BeautifulSoup
 from cesal_logger import setup_logging
-from settings import DEBUG, EMAIL, PASSWORD
-
-setup_logging(DEBUG)
+from notification import send_notification
+from settings import ARRIVAL_DATE, DEBUG, DEPARTURE_DATE, EMAIL, PASSWORD
 
 LOGGER = getLogger(__name__)
 
 
 NO_HOUSING_AVAILABLE = "Aucun logement disponible"
 NUMBER_OF_RESIDENCES = 6
-CESAL_AUTH_COOKIES = [
-    "CESAL_LOGEMENT",
-    #   "CSLAC_LOGEMENT"
-]
+CESAL_AUTH_COOKIES = ["CESAL_LOGEMENT", "CSLAC_LOGEMENT"]
 
 
 class HousingAvailabilityChecker:
@@ -56,6 +52,22 @@ class HousingAvailabilityChecker:
         LOGGER.debug(f"Cookies: {self.session.cookies}")
         LOGGER.info("Authentication successful")
 
+    def _get_availability_payload(self, arrival_date: str, departure_date: str) -> dict[str, str]:
+        """
+        Get the payload to check the availability of housing in the CESAL residence.
+
+        Args:
+        ----
+            arrival_date: The arrival date in the format "YYYY-MM-DD".
+            departure_date (str): The departure date in the format "YYYY-MM-DD".
+
+        Returns:
+        -------
+            dict[str, str]: The payload
+
+        """
+        return {"action": "modifier_date_arrivee", "date_arrivee": arrival_date, "date_sortie": departure_date}
+
     def check_availability(self) -> None:
         """
         Check the availability of housing in the CESAL residence.
@@ -66,42 +78,34 @@ class HousingAvailabilityChecker:
             Exception: If the element with the id residence_{i}_logements_disponibles was not found.
 
         """
-        payload = {
-            "action": "modifier_date_arrivee",
-            "date_arrivee": "2024-07-12",
-            "avec_heure_arrivee_2024-06-28": "0",
-            "avec_heure_arrivee_2024-07-01": "0",
-            "avec_heure_arrivee_2024-07-02": "0",
-            "avec_heure_arrivee_2024-07-03": "0",
-            "avec_heure_arrivee_2024-07-04": "0",
-            "avec_heure_arrivee_2024-07-05": "0",
-            "avec_heure_arrivee_2024-07-08": "0",
-            "avec_heure_arrivee_2024-07-09": "0",
-            "avec_heure_arrivee_2024-07-10": "0",
-            "avec_heure_arrivee_2024-07-11": "0",
-            "avec_heure_arrivee_2024-07-12": "0",
-            "avec_heure_arrivee_2024-07-15": "0",
-            "avec_heure_arrivee_2024-07-16": "0",
-            "avec_heure_arrivee_2024-07-17": "0",
-            "date_sortie": "30/04/2025",
-        }
+        payload = self._get_availability_payload(ARRIVAL_DATE, DEPARTURE_DATE)
         response = self.session.post(self.url, data=payload, timeout=10)
+        html_response = response.text
         if not response.status_code == 200:
             raise Exception(f"Failed to retrieve the webpage. Status code: {response.status_code}")
-        soup = BeautifulSoup(response.content, "html.parser")
         self.dump_response(response.text, "response.html")
 
+        pattern = r"\$\( document \)\.ready\(function\(\) \{([\s\S]*?)\}\);"
+
+        number_of_free_housings = 0
         for i in range(1, NUMBER_OF_RESIDENCES + 1):
-            residence_id = f"residence_{i}_logements_disponibles"
-            element = soup.find(id=residence_id)
-            if not element:
-                raise Exception(f"Element with id {residence_id} not found")
+            pattern = rf'\$\("#residence_{i}_logements_disponibles"\)\.html\("([^"]+)"\)'
+            match = re.search(pattern, html_response)
 
-            text = element.get_text(strip=True)
-            if text == NO_HOUSING_AVAILABLE:
-                LOGGER.info(f"Residence {i}: No housing available")
+            if not match:
+                raise Exception(f"Could not find the element with id residence_{i}_logements_disponibles")
 
-            LOGGER.info(f"Residence {i}: Housing available")
+            housing_status = match.group(1).strip()
+
+            if housing_status != NO_HOUSING_AVAILABLE:
+                number_of_free_housings += 1
+                LOGGER.info(f"Residence {i} has housing available!")
+                send_notification(residence_id=i)
+
+        if number_of_free_housings == 0:
+            LOGGER.info("No housing available.")
+        else:
+            LOGGER.info(f"{number_of_free_housings} housing(s) available!")
 
     def dump_response(self, response: str, filename: str) -> None:
         """
@@ -130,4 +134,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    setup_logging(DEBUG)
     main()
