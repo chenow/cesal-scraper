@@ -1,0 +1,11 @@
+services:
+  app:
+    image: cesal-scraper
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cesal-scraper
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app
