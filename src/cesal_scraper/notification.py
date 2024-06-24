@@ -2,7 +2,8 @@ from logging import getLogger
 
 import requests
 
-from .settings import BOT_TOKEN, CHAT_ID
+from .constants import CESAL_URL
+from .settings import ARRIVAL_DATE, BOT_TOKEN, CHAT_ID, DEPARTURE_DATE
 
 LOGGER = getLogger(__name__)
 
@@ -16,7 +17,13 @@ def send_notification(residence_id: int) -> None:
         residence_id: The ID of the residence where the housing is available.
 
     """
-    message = f"Logement disponible à la résidence {residence_id} !"
+    message = (
+        f"Logement disponible à la résidence {residence_id} !\n\n"
+        f"Date d'arrivée: {ARRIVAL_DATE}\n"
+        f"Date de départ: {DEPARTURE_DATE}\n"
+        f"Url: {CESAL_URL}"
+    )
+
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={message}"
     response = requests.get(url, timeout=5)
     LOGGER.info(f"{response.status_code}: {response.json()}")
