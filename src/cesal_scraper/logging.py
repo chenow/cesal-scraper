@@ -3,9 +3,12 @@ import logging.config
 
 import colorlog
 
+from .settings import DEBUG
 
-def setup_logging(debug: bool) -> None:
-    log_level = logging.DEBUG if debug else logging.INFO
+
+def setup_logging() -> None:
+    """Setups the logging configuration for the application."""
+    log_level = logging.DEBUG if DEBUG else logging.INFO
     log_file = "temp/cesal-scraper.log"
 
     # Define the format for file handler

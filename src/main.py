@@ -2,7 +2,6 @@
 from logging import getLogger
 
 from cesal_scraper import HousingAvailabilityChecker, setup_logging
-from cesal_scraper.settings import DEBUG
 
 LOGGER = getLogger(__name__)
 
@@ -16,5 +15,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    setup_logging(DEBUG)
+    setup_logging()
     main()
