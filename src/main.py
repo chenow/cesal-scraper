@@ -7,10 +7,8 @@ LOGGER = getLogger(__name__)
 
 
 def main() -> None:
-    url = "https://logement.cesal.fr/espace-resident/cesal_mon_logement_reservation.php"
-    login_url = "https://logement.cesal.fr/espace-resident/cesal_login.php"
     LOGGER.info("Checking housing availability...")
-    checker = HousingAvailabilityChecker(url, login_url)
+    checker = HousingAvailabilityChecker()
     checker.check_availability()
 
 

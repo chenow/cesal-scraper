@@ -4,21 +4,24 @@ from pathlib import Path
 
 import requests
 
+from cesal_scraper.constants import (
+    CESAL_AUTH_COOKIES,
+    CESAL_LOGIN_URL,
+    CESAL_URL,
+    NO_HOUSING_AVAILABLE,
+    NUMBER_OF_RESIDENCES,
+)
+
 from .notification import send_notification
 from .settings import ARRIVAL_DATE, DEBUG, DEPARTURE_DATE, EMAIL, PASSWORD
 
 LOGGER = getLogger(__name__)
 
 
-NO_HOUSING_AVAILABLE = "Aucun logement disponible"
-NUMBER_OF_RESIDENCES = 6
-CESAL_AUTH_COOKIES = ["CESAL_LOGEMENT", "CSLAC_LOGEMENT"]
-
-
 class HousingAvailabilityChecker:
     """Used to check the availability of housing in the CESAL residence."""
 
-    def __init__(self, url: str, login_url: str) -> None:
+    def __init__(self, url: str = CESAL_URL, login_url: str = CESAL_LOGIN_URL) -> None:
         """
         Initialize the HousingAvailabilityChecker object.
 
