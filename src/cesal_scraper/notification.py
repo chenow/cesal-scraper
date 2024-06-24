@@ -1,7 +1,8 @@
 from logging import getLogger
 
 import requests
-from settings import BOT_TOKEN, CHAT_ID
+
+from .settings import BOT_TOKEN, CHAT_ID
 
 LOGGER = getLogger(__name__)
 
