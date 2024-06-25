@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from logging import getLogger
 from pathlib import Path
 
@@ -13,7 +14,7 @@ from cesal_scraper.constants import (
 )
 
 from .notification import send_notification
-from .settings import ARRIVAL_DATE, DEBUG, DEPARTURE_DATE, EMAIL, PASSWORD
+from .settings import ARRIVAL_DATE, DEBUG, DEPARTURE_DATE, EMAIL, PASSWORD, TIMEZONE, WORKING_HOURS
 
 LOGGER = getLogger(__name__)
 
@@ -38,6 +39,9 @@ class HousingAvailabilityChecker:
 
     def _authenticate(self) -> None:
         """Login to the CESAL website to get auth COOKIES."""
+        if not WORKING_HOURS[0] <= datetime.now(tz=TIMEZONE).hour < WORKING_HOURS[1]:
+            return
+
         payload: dict[str, str] = {
             "action": "login",
             "login-email": EMAIL,
@@ -81,6 +85,10 @@ class HousingAvailabilityChecker:
             Exception: If the element with the id residence_{i}_logements_disponibles was not found.
 
         """
+        if not WORKING_HOURS[0] <= datetime.now(tz=TIMEZONE).hour < WORKING_HOURS[1]:
+            LOGGER.info("Outside of working hours. Skipping...")
+            return
+
         payload = self._get_availability_payload(ARRIVAL_DATE, DEPARTURE_DATE)
         response = self.session.post(self.url, data=payload, timeout=10)
         html_response = response.text

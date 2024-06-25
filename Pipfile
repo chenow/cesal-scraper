@@ -7,6 +7,7 @@ name = "pypi"
 requests = "*"
 beautifulsoup4 = "*"
 colorlog = "*"
+pytz = "*"
 
 [dev-packages]
 ruff = "*"
