@@ -103,6 +103,8 @@ class HousingAvailabilityChecker:
             if housing_status != NO_HOUSING_AVAILABLE:
                 number_of_free_housings += 1
                 LOGGER.info(f"Residence {i} has housing available!")
+                dump_filename = f"residence_{i}.html"
+                self.dump_response(html_response, dump_filename, forced=True)
                 send_notification(residence_id=i)
 
         if number_of_free_housings == 0:
@@ -110,7 +112,7 @@ class HousingAvailabilityChecker:
         else:
             LOGGER.info(f"{number_of_free_housings} housing(s) available!")
 
-    def dump_response(self, response: str, filename: str) -> None:
+    def dump_response(self, response: str, filename: str, forced: bool = False) -> None:
         """
         Dump the response to a file for debugging purposes.
 
@@ -118,9 +120,10 @@ class HousingAvailabilityChecker:
         ----
             response: The response to dump.
             filename: The name of the file to dump the response to.
+            forced: If True, the response will be dumped even if DEBUG is False.
 
         """
-        if not DEBUG:
+        if not DEBUG and not forced:
             return
 
         path = Path(f"temp/{filename}")
