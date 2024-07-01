@@ -9,3 +9,4 @@ services:
       - .env
     volumes:
       - ./src:/app
+      - ./pyproject.toml:/pyproject.toml

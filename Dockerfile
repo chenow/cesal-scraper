@@ -14,7 +14,7 @@ COPY Pipfile Pipfile.lock ./
 
 # Build dev dependencies
 FROM build-deps AS build-deps-release
-RUN pipenv install --deploy
+RUN pipenv install --dev
 
 
 ############################
