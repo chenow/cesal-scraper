@@ -1,4 +1,5 @@
 import re
+import time
 from datetime import datetime
 from logging import getLogger
 from pathlib import Path
@@ -14,7 +15,7 @@ from cesal_scraper.constants import (
 )
 
 from .notification import send_notification
-from .settings import ARRIVAL_DATE, DEBUG, DEPARTURE_DATE, EMAIL, PASSWORD, TIMEZONE, WORKING_HOURS
+from .settings import ARRIVAL_DATES, DEBUG, DEPARTURE_DATE, EMAIL, PASSWORD, TIMEZONE, WORKING_HOURS
 
 LOGGER = getLogger(__name__)
 
@@ -73,9 +74,19 @@ class HousingAvailabilityChecker:
             dict[str, str]: The payload
 
         """
-        return {"action": "modifier_date_arrivee", "date_arrivee": arrival_date, "date_sortie": departure_date}
+        return {
+            "action": "modifier_date_arrivee",
+            "date_arrivee": arrival_date,
+            "date_sortie": departure_date,
+        }
 
-    def check_availability(self) -> None:
+    def check_availabilities(self) -> None:
+        """Check the availability of housing for all the arrival dates specified in the settings."""
+        for date in ARRIVAL_DATES:
+            self.check_availability(date)
+            time.sleep(4)
+
+    def check_availability(self, arrival_date: str) -> None:
         """
         Check the availability of housing in the CESAL residence.
 
@@ -89,14 +100,12 @@ class HousingAvailabilityChecker:
             LOGGER.info("Outside of working hours. Skipping...")
             return
 
-        payload = self._get_availability_payload(ARRIVAL_DATE, DEPARTURE_DATE)
+        payload = self._get_availability_payload(arrival_date, DEPARTURE_DATE)
         response = self.session.post(self.url, data=payload, timeout=10)
         html_response = response.text
         if not response.status_code == 200:
             raise Exception(f"Failed to retrieve the webpage. Status code: {response.status_code}")
         self.dump_response(response.text, "response.html")
-
-        pattern = r"\$\( document \)\.ready\(function\(\) \{([\s\S]*?)\}\);"
 
         number_of_free_housings = 0
         for i in range(1, NUMBER_OF_RESIDENCES + 1):
@@ -113,7 +122,7 @@ class HousingAvailabilityChecker:
                 LOGGER.info(f"Residence {i} has housing available!")
                 dump_filename = f"residence_{i}.html"
                 self.dump_response(html_response, dump_filename, forced=True)
-                send_notification(residence_id=i)
+                send_notification(i, arrival_date)
 
         if number_of_free_housings == 0:
             LOGGER.info("No housing available.")

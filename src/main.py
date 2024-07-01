@@ -9,7 +9,7 @@ LOGGER = getLogger(__name__)
 def main() -> None:
     LOGGER.info("Checking housing availability...")
     checker = HousingAvailabilityChecker()
-    checker.check_availability()
+    checker.check_availabilities()
 
 
 if __name__ == "__main__":

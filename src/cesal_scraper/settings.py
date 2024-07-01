@@ -10,7 +10,7 @@ BOT_TOKEN = os.environ["BOT_TOKEN"]
 CHAT_ID = os.environ["CHAT_ID"]
 
 
-ARRIVAL_DATE = os.environ["ARRIVAL_DATE"]
+ARRIVAL_DATES = os.environ["ARRIVAL_DATES"].split(",")
 DEPARTURE_DATE = os.environ["DEPARTURE_DATE"]
 WORKING_HOURS = (8, 20)
 
