@@ -2,7 +2,7 @@ import sys
 from datetime import datetime
 from logging import getLogger
 
-from .settings import DEBUG, TIMEZONE, WORKING_HOURS
+from .constants import DEBUG, TIMEZONE, WORKING_HOURS
 
 LOGGER = getLogger(__name__)
 

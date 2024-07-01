@@ -3,7 +3,7 @@ from logging import getLogger
 
 from cesal_logger import setup_logging
 from cesal_scraper import HousingAvailabilityChecker, check_working_hours
-from cesal_scraper.settings import DEBUG
+from cesal_scraper.constants import DEBUG
 
 LOGGER = getLogger(__name__)
 

@@ -14,8 +14,8 @@ from cesal_scraper.constants import (
 )
 from notification import send_notification
 
+from .constants import ARRIVAL_DATES, DEBUG, DEPARTURE_DATE, EMAIL, PASSWORD
 from .errors import AuthNotSuccessfulError, ImpossibleToParseError
-from .settings import ARRIVAL_DATES, DEBUG, DEPARTURE_DATE, EMAIL, PASSWORD
 
 LOGGER = getLogger(__name__)
 

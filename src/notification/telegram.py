@@ -1,8 +1,7 @@
 from logging import getLogger
 
 import requests
-from cesal_scraper.constants import CESAL_URL
-from cesal_scraper.settings import DEPARTURE_DATE
+from cesal_scraper.constants import CESAL_URL, DEPARTURE_DATE
 
 from .constants import BOT_TOKEN, CHAT_ID
 
