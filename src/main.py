@@ -1,7 +1,9 @@
 # noqa: INP001
 from logging import getLogger
 
-from cesal_scraper import HousingAvailabilityChecker, check_working_hours, setup_logging
+from cesal_logger import setup_logging
+from cesal_scraper import HousingAvailabilityChecker, check_working_hours
+from cesal_scraper.settings import DEBUG
 
 LOGGER = getLogger(__name__)
 
@@ -14,5 +16,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    setup_logging()
+    setup_logging(DEBUG)
     main()

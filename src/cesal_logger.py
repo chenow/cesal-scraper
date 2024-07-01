@@ -1,15 +1,14 @@
+# noqa: INP001
 import logging
 import logging.config
 from pathlib import Path
 
 import colorlog
 
-from .settings import DEBUG
 
-
-def setup_logging() -> None:
+def setup_logging(debug: bool = False) -> None:
     """Setups the logging configuration for the application."""
-    log_level = logging.DEBUG if DEBUG else logging.INFO
+    log_level = logging.DEBUG if debug else logging.INFO
     log_file = "temp/cesal-scraper.log"
 
     # Check if temp folder exists
