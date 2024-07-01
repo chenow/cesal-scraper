@@ -42,3 +42,4 @@ target-version = "py312"
             "first-party",
             "local-folder",
         ]
+        known-first-party = ["notification"]

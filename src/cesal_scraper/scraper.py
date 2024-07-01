@@ -12,9 +12,9 @@ from cesal_scraper.constants import (
     NO_HOUSING_AVAILABLE,
     NUMBER_OF_RESIDENCES,
 )
+from notification import send_notification
 
 from .errors import AuthNotSuccessfulError, ImpossibleToParseError
-from .notification import send_notification
 from .settings import ARRIVAL_DATES, DEBUG, DEPARTURE_DATE, EMAIL, PASSWORD
 
 LOGGER = getLogger(__name__)

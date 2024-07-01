@@ -1,16 +1,17 @@
 from logging import getLogger
 
 import requests
+from cesal_scraper.constants import CESAL_URL
+from cesal_scraper.settings import DEPARTURE_DATE
 
-from .constants import CESAL_URL
-from .settings import BOT_TOKEN, CHAT_ID, DEPARTURE_DATE
+from .constants import BOT_TOKEN, CHAT_ID
 
 LOGGER = getLogger(__name__)
 
 
 def send_notification(residence_id: int, arrival_date: str) -> None:
     """
-    Send a telegram notification to the user to say that a housing is available.
+    Send a message to the user using a Telegram bot, if a housing is available.
 
     Args:
     ----
