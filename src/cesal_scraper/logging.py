@@ -1,5 +1,6 @@
 import logging
 import logging.config
+from pathlib import Path
 
 import colorlog
 
@@ -10,6 +11,10 @@ def setup_logging() -> None:
     """Setups the logging configuration for the application."""
     log_level = logging.DEBUG if DEBUG else logging.INFO
     log_file = "temp/cesal-scraper.log"
+
+    # Check if temp folder exists
+    if not Path("temp").exists():
+        Path("temp").mkdir()
 
     # Define the format for file handler
     file_formatter = logging.Formatter(
