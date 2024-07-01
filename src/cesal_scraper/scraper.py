@@ -13,6 +13,7 @@ from cesal_scraper.constants import (
     NUMBER_OF_RESIDENCES,
 )
 
+from .errors import AuthNotSuccessfulError
 from .notification import send_notification
 from .settings import ARRIVAL_DATES, DEBUG, DEPARTURE_DATE, EMAIL, PASSWORD
 
@@ -38,7 +39,15 @@ class HousingAvailabilityChecker:
         self._authenticate()
 
     def _authenticate(self) -> None:
-        """Login to the CESAL website to get auth COOKIES."""
+        """
+        Login to the CESAL website to get auth COOKIES.
+
+        Raises
+        ------
+            Exception: If the login webpage could not be retrieved.
+            AuthNotSuccessfulError: If the authentication cookies were not set.
+
+        """
         payload: dict[str, str] = {
             "action": "login",
             "login-email": EMAIL,
@@ -51,7 +60,7 @@ class HousingAvailabilityChecker:
             raise Exception(f"Failed to login. Status code: {response.status_code}")
 
         if any(cookie not in self.session.cookies for cookie in CESAL_AUTH_COOKIES):
-            raise Exception("CESAL_AUTH_COOKIES not found in login response.")
+            raise AuthNotSuccessfulError
 
         LOGGER.debug(f"Cookies: {self.session.cookies}")
         LOGGER.info("Authentication successful")
