@@ -13,7 +13,7 @@ from cesal_scraper.constants import (
     NUMBER_OF_RESIDENCES,
 )
 
-from .errors import AuthNotSuccessfulError
+from .errors import AuthNotSuccessfulError, ImpossibleToParseError
 from .notification import send_notification
 from .settings import ARRIVAL_DATES, DEBUG, DEPARTURE_DATE, EMAIL, PASSWORD
 
@@ -98,7 +98,7 @@ class HousingAvailabilityChecker:
         Raises
         ------
             Exception: If the webpage could not be retrieved.
-            Exception: If the element with the id residence_{i}_logements_disponibles was not found.
+            ImpossibleToParseError: If the cesal response could not be parsed.
 
         """
         payload = self._get_availability_payload(arrival_date, DEPARTURE_DATE)
@@ -114,7 +114,7 @@ class HousingAvailabilityChecker:
             match = re.search(pattern, html_response)
 
             if not match:
-                raise Exception(f"Could not find the element with id residence_{i}_logements_disponibles")
+                raise ImpossibleToParseError(i)
 
             housing_status = match.group(1).strip()
 
