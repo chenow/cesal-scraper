@@ -3,6 +3,8 @@ from logging import getLogger
 import requests
 from cesal_scraper.constants import CESAL_URL, DEPARTURE_DATE
 
+from notification.errors import ImpossibleToSendNotificationError
+
 from .constants import BOT_TOKEN, CHAT_ID
 
 LOGGER = getLogger(__name__)
@@ -17,7 +19,12 @@ def send_notification(residence_id: int, arrival_date: str) -> None:
         residence_id: The ID of the residence where the housing is available.
         arrival_date: The date of arrival in the housing.
 
+    Raises:
+    ------
+        ImpossibleToSendNotificationError: If the telegram chat couldn't be sent.
+
     """
+    LOGGER.info("Sending notification...")
     message = (
         f"Logement disponible à la résidence {residence_id} !\n\n"
         f"Date d'arrivée: {arrival_date}\n"
@@ -27,4 +34,6 @@ def send_notification(residence_id: int, arrival_date: str) -> None:
 
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={message}"
     response = requests.get(url, timeout=5)
-    LOGGER.info(f"{response.status_code}: {response.json()}")
+
+    if not response.ok:
+        raise ImpossibleToSendNotificationError
